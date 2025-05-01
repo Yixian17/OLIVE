@@ -154,6 +154,7 @@ const handleUpdate = () => {
       ...form.value,
       number_of_ingredients: form.value.ingredients.length,
       creation_date: new Date().toISOString().split("T")[0],
+      image_blob_url: imagePreview.value,
     };
 
     await fetch(`http://localhost:3000/recipes/${route.params.id}`, {
@@ -198,5 +199,14 @@ onMounted(loadRecipe);
   color: #999;
   font-weight: bold;
   cursor: pointer;
+}
+
+.image-preview {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+  background-color: #f4f4f4;
 }
 </style>

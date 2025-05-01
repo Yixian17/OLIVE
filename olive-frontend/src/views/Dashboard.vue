@@ -53,12 +53,32 @@
         style="width: 100%"
         border
       >
+        <el-table-column label="Image">
+          <template #default="scope">
+            <img
+              :src="scope.row.image_url"
+              alt="recipe image"
+              class="recipe-thumb"
+            />
+          </template>
+        </el-table-column>
+
         <el-table-column prop="title" label="Title" />
-        <el-table-column prop="difficulty" label="Difficulty" />
-        <el-table-column
-          prop="number_of_ingredients"
-          label="Ingredient Count"
-        />
+        <el-table-column label="Difficulty">
+          <template #default="scope">
+            <el-tag
+              :type="
+                {
+                  Easy: 'success',
+                  Medium: 'warning',
+                  Hard: 'danger',
+                }[scope.row.difficulty]
+              "
+            >
+              {{ scope.row.difficulty }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="creator_name" label="Creator Name" />
         <el-table-column prop="creation_date" label="Creation Date" />
         <el-table-column label="Actions" width="120" align="center">
@@ -74,18 +94,17 @@
           </template>
         </el-table-column>
       </el-table>
-
-      <!-- PAGINATION -->
-      <el-pagination
-        style="margin-top: 20px; text-align: right"
-        background
-        layout="prev, pager, next"
-        :total="filteredRecipes.length"
-        :page-size="pageSize"
-        :current-page="currentPage"
-        @current-change="currentPage = $event"
-      />
     </el-card>
+    <!-- PAGINATION -->
+    <el-pagination
+      style="margin-top: 20px; text-align: right"
+      background
+      layout="prev, pager, next"
+      :total="filteredRecipes.length"
+      :page-size="pageSize"
+      :current-page="currentPage"
+      @current-change="currentPage = $event"
+    />
   </div>
 </template>
 
@@ -160,4 +179,11 @@ const goToDetails = (id) => {
 };
 </script>
 
-<style></style>
+<style>
+.recipe-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+</style>

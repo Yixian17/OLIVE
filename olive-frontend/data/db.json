@@ -11,12 +11,12 @@
         "Olive Oil",
         "Chicken"
       ],
-      "instructions": "Boil spaghetti. Cook ground beef with garlic, onion, and tomato sauce. Mix together and serve.",
+      "instructions": "1. Finely chop the onion, garlic, carrot, and celery. Grate cheese and set aside.\n2. Heat olive oil in a pan. Sauté onions 2–3 mins. Add garlic, carrot, celery. Cook 2–3 mins.\n3. Add beef, break it apart, and cook until browned (6–8 mins). Season with salt and pepper.\n4. Stir in tomato paste, canned tomatoes, oregano, basil. Simmer 15–20 mins uncovered. Stir occasionally.\n5. Boil water and cook spaghetti as per instructions. Drain and set aside.\n6. Serve spaghetti with sauce. Top with parmesan and basil if desired.",
       "difficulty": "Easy",
       "number_of_ingredients": 7,
       "creator_name": "Alice",
       "creation_date": "2025-05-01",
-      "image_url": "https://example.com/spaghetti.jpg",
+      "image_url": "/images/pasta.png",
       "id": "1"
     },
     {

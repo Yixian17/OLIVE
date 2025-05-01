@@ -1,53 +1,65 @@
 <template>
-  <el-card v-if="recipe" class="details-container">
-    <el-button type="text" @click="goBack" style="margin-bottom: 20px">
-      ← Back to Dashboard
-    </el-button>
+  <div>
+    <div v-if="recipe" class="details-container">
+      <div class="top-action-buttons">
+        <el-button type="text" @click="goBack" style="margin-bottom: 20px">
+          ← Back to Dashboard
+        </el-button>
 
-    <el-button type="primary" @click="goToEdit" style="float: right"
-      >Edit</el-button
-    >
-
-    <h2>{{ recipe.title }}</h2>
-
-    <el-descriptions :column="1" border>
-      <el-descriptions-item label="Difficulty">
-        {{ recipe.difficulty }}
-      </el-descriptions-item>
-
-      <el-descriptions-item label="Creator">
-        {{ recipe.creator_name }}
-      </el-descriptions-item>
-
-      <el-descriptions-item label="Created On">
-        {{ recipe.creation_date }}
-      </el-descriptions-item>
-
-      <el-descriptions-item label="Ingredients">
-        <el-tag
-          v-for="(ingredient, index) in recipe.ingredients"
-          :key="index"
-          type="success"
-          class="ingredient-tag"
+        <el-button type="primary" @click="goToEdit" style="float: right"
+          >Edit</el-button
         >
-          {{ ingredient }}
-        </el-tag>
-      </el-descriptions-item>
+      </div>
 
-      <el-descriptions-item label="Instructions">
-        <div style="white-space: pre-wrap">
-          {{ recipe.instructions || "No instructions provided." }}
+      <h2>{{ recipe.title }}</h2>
+
+      <div class="details-flex">
+        <div class="details-image">
+          <img
+            :src="recipe.image_url"
+            alt="Recipe Image"
+            @error="handleImageError"
+          />
         </div>
-      </el-descriptions-item>
 
-      <el-descriptions-item label="Image" v-if="recipe.image_url">
-        <img :src="recipe.image_url" alt="Recipe Image" class="recipe-image" />
-      </el-descriptions-item>
-    </el-descriptions>
-  </el-card>
+        <div class="details-info">
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="Difficulty">
+              {{ recipe.difficulty }}
+            </el-descriptions-item>
 
-  <div v-else class="empty-message">
-    <el-empty description="Recipe not found or still loading..." />
+            <el-descriptions-item label="Creator">
+              {{ recipe.creator_name }}
+            </el-descriptions-item>
+
+            <el-descriptions-item label="Created On">
+              {{ recipe.creation_date }}
+            </el-descriptions-item>
+
+            <el-descriptions-item label="Ingredients">
+              <el-tag
+                v-for="(ingredient, index) in recipe.ingredients"
+                :key="index"
+                type="success"
+                class="ingredient-tag"
+              >
+                {{ ingredient }}
+              </el-tag>
+            </el-descriptions-item>
+
+            <el-descriptions-item label="Instructions">
+              <div style="white-space: pre-wrap">
+                {{ recipe.instructions || "No instructions provided." }}
+              </div>
+            </el-descriptions-item>
+          </el-descriptions>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="empty-message">
+      <el-empty description="Recipe not found or still loading..." />
+    </div>
   </div>
 </template>
 
@@ -90,14 +102,42 @@ onMounted(loadRecipe);
   margin-top: 5px;
 }
 
-.recipe-image {
-  max-width: 300px;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
 .empty-message {
   margin: 40px auto;
   text-align: center;
+}
+
+.details-flex {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.details-image img {
+  width: 400px;
+  height: 300px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+  background-color: #f4f4f4;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.details-info {
+  flex: 1;
+}
+
+h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.top-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 </style>

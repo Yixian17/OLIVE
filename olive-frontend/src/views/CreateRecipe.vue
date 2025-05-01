@@ -66,6 +66,14 @@
         <el-input v-model="form.creator_name" placeholder="Enter your name" />
       </el-form-item>
 
+      <!-- Upload Image -->
+      <el-form-item label="Image URL" prop="image_url">
+        <el-input
+          v-model="form.image_url"
+          placeholder="https://example.com/image.jpg"
+        />
+      </el-form-item>
+
       <!-- Submit Button -->
       <el-form-item>
         <div class="submit-button">
@@ -91,6 +99,7 @@ const form = ref({
   instructions: "",
   difficulty: "",
   creator_name: "",
+  image_url: "",
 });
 
 const ingredient = ref("");
@@ -127,6 +136,13 @@ const rules = {
   ],
   creator_name: [
     { required: true, message: "Creator name is required", trigger: "blur" },
+  ],
+  image_url: [
+    {
+      type: "url",
+      message: "Must be a valid URL",
+      trigger: "blur",
+    },
   ],
 };
 
@@ -184,6 +200,8 @@ const handleSubmit = async () => {
       ingredients: [],
       instructions: "",
       difficulty: "",
+      creator_name: "",
+      image_url: "",
     };
 
     // redirect after a short delay
