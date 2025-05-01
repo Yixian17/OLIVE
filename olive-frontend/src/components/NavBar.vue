@@ -7,7 +7,7 @@
       <!-- Navigation Links -->
       <div class="navbar__links">
         <el-button type="text" @click="goTo('/')">Dashboard</el-button>
-        <el-button type="text" @click="goTo('/recipes/new')"
+        <el-button type="text" @click="goTo('/create')"
           >Create Recipe</el-button
         >
       </div>

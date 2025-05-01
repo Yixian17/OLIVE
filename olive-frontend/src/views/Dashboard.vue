@@ -1,18 +1,7 @@
-<!-- <template>
-  <div>
-    <div class="dashboard-container">
-      <h1>Dashboard</h1>
-      <div v-if="recipes.length">
-        <RecipeList :recipes="recipes" />
-      </div>
-    </div>
-  </div>
-</template> -->
-
 <template>
   <div class="dashboard-container">
     <el-card shadow="hover">
-      <h2>Recipe Dashboard</h2>
+      <h2>Dashboard</h2>
 
       <!-- FILTER BAR -->
       <el-row :gutter="10" align="middle" style="margin-bottom: 20px">
@@ -70,9 +59,9 @@
           prop="number_of_ingredients"
           label="Ingredient Count"
         />
-        <el-table-column prop="creator_name" label="Creator" />
+        <el-table-column prop="creator_name" label="Creator Name" />
         <el-table-column prop="creation_date" label="Creation Date" />
-        <el-table-column label="Actions" width="120">
+        <el-table-column label="Actions" width="120" align="center">
           <template #default="scope">
             <el-button
               size="small"
@@ -100,20 +89,6 @@
   </div>
 </template>
 
-<!-- <script>
-import RecipeList from "../components/RecipeList.vue";
-import getRecipes from "../composables/getRecipes";
-export default {
-  name: "Dashboard",
-  components: { RecipeList },
-  setup() {
-    const { recipes, error, load } = getRecipes();
-    load();
-    return { recipes, error };
-  },
-};
-</script> -->
-
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRecipeStore } from "../stores/recipeStore";
@@ -140,17 +115,31 @@ onMounted(async () => {
 
 const filteredRecipes = computed(() => {
   return recipeStore.recipes.filter((recipe) => {
-    const matchesTitle = recipe.title
-      .toLowerCase()
-      .includes(searchTitle.value.toLowerCase());
-    const matchesDifficulty = filterDifficulty.value
-      ? recipe.difficulty === filterDifficulty.value
-      : true;
-    const matchesIngredientCount =
-      filterIngredientCount.value !== null
-        ? recipe.number_of_ingredients === filterIngredientCount.value
-        : true;
-    return matchesTitle && matchesDifficulty && matchesIngredientCount;
+    // filter by title
+    let matchTitle = true;
+    if (searchTitle.value) {
+      matchTitle = recipe.title
+        .toLowerCase()
+        .includes(searchTitle.value.toLowerCase());
+    }
+
+    // filter by difficulty
+    let matchDifficulty;
+    if (filterDifficulty.value) {
+      matchDifficulty = recipe.difficulty === filterDifficulty.value;
+    } else {
+      matchDifficulty = true;
+    }
+
+    // filter by ingredient count
+    let matchIngredientCount;
+    if (filterIngredientCount.value) {
+      matchIngredientCount =
+        recipe.number_of_ingredients === filterIngredientCount.value;
+    } else {
+      matchIngredientCount = true;
+    }
+    return matchTitle && matchDifficulty && matchIngredientCount;
   });
 });
 

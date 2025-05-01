@@ -1,49 +1,12 @@
-<!-- <template>
-  <div>
-    <div v-if="error" class="error">{{ error }}</div>
-    <div v-if="recipe" class="recipe">
-      <h3>{{ recipe.title }}</h3>
-      <p class="pre">{{ recipe.creation_date }}</p>
-    </div>
-  </div>
-</template>
-
-<script>
-import getRecipe from "../composables/getRecipe";
-
-export default {
-  props: ["id"],
-  setup(props) {
-    const { recipe, error, load } = getRecipe(props.id);
-
-    load();
-    return { recipe, error };
-  },
-};
-</script>
-<style scoped>
-.tags a {
-  margin-right: 10px;
-}
-.recipe {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.recipe p {
-  color: #444;
-  line-height: 1.5em;
-  margin-top: 40px;
-}
-.pre {
-  white-space: pre-wrap;
-}
-</style> -->
-
 <template>
   <el-card v-if="recipe" class="details-container">
     <el-button type="text" @click="goBack" style="margin-bottom: 20px">
       ← Back to Dashboard
     </el-button>
+
+    <el-button type="primary" @click="goToEdit" style="float: right"
+      >Edit</el-button
+    >
 
     <h2>{{ recipe.title }}</h2>
 
@@ -60,12 +23,6 @@ export default {
         {{ recipe.creation_date }}
       </el-descriptions-item>
 
-      <el-descriptions-item label="Instructions">
-        <div style="white-space: pre-wrap">
-          {{ recipe.instructions || "No instructions provided." }}
-        </div>
-      </el-descriptions-item>
-
       <el-descriptions-item label="Ingredients">
         <el-tag
           v-for="(ingredient, index) in recipe.ingredients"
@@ -75,6 +32,12 @@ export default {
         >
           {{ ingredient }}
         </el-tag>
+      </el-descriptions-item>
+
+      <el-descriptions-item label="Instructions">
+        <div style="white-space: pre-wrap">
+          {{ recipe.instructions || "No instructions provided." }}
+        </div>
       </el-descriptions-item>
 
       <el-descriptions-item label="Image" v-if="recipe.image_url">
@@ -107,6 +70,10 @@ const loadRecipe = async () => {
 
 const goBack = () => {
   router.push("/");
+};
+
+const goToEdit = () => {
+  router.push(`/recipes/${route.params.id}/edit`);
 };
 
 onMounted(loadRecipe);
