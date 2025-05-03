@@ -29,11 +29,11 @@
             </el-descriptions-item>
 
             <el-descriptions-item label="Creator">
-              {{ recipe.creator_name }}
+              {{ recipe.creatorName }}
             </el-descriptions-item>
 
             <el-descriptions-item label="Created On">
-              {{ recipe.creation_date }}
+              {{ recipe.createdDate.slice(0, 10) }}
             </el-descriptions-item>
 
             <el-descriptions-item label="Ingredients">
@@ -43,13 +43,13 @@
                 type="success"
                 class="ingredient-tag"
               >
-                {{ ingredient }}
+                {{ ingredient.name }}
               </el-tag>
             </el-descriptions-item>
 
             <el-descriptions-item label="Instructions">
               <div style="white-space: pre-wrap">
-                {{ recipe.instructions || "No instructions provided." }}
+                {{ recipe.instruction || "No instructions provided." }}
               </div>
             </el-descriptions-item>
           </el-descriptions>
@@ -78,6 +78,7 @@ const loadRecipe = async () => {
   const id = route.params.id;
   const result = await recipeStore.fetchRecipeById(id);
   recipe.value = result;
+  console.log(recipe.value);
 };
 
 const goBack = () => {

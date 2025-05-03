@@ -99,7 +99,6 @@ const form = ref({
   instructions: "",
   difficulty: "",
   creator_name: "",
-  image_url: "",
 });
 
 const ingredient = ref("");
@@ -170,8 +169,11 @@ const handleSubmit = async () => {
     if (!valid) return;
     const recipe = {
       ...form.value,
+      ingredients: form.value.ingredients.map((name) => ({
+        ingredientName: name,
+      })),
       number_of_ingredients: form.value.ingredients.length,
-      creation_date: new Date().toISOString().split("T")[0],
+      creation_date: new Date().toISOString(),
     };
 
     await recipeStore.fetchRecipes();
@@ -186,11 +188,20 @@ const handleSubmit = async () => {
       return;
     }
 
-    await fetch("http://localhost:3000/recipes", {
+    await fetch("http://localhost:8080/api/recipes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(recipe),
-    });
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        alert("Recipe submitted successfully!");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+
+    console.log(JSON.stringify(recipe, null, 2));
 
     showSuccess.value = true;
 
@@ -201,7 +212,6 @@ const handleSubmit = async () => {
       instructions: "",
       difficulty: "",
       creator_name: "",
-      image_url: "",
     };
 
     // redirect after a short delay

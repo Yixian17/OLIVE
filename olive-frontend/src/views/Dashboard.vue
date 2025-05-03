@@ -79,8 +79,8 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="creator_name" label="Creator Name" />
-        <el-table-column prop="creation_date" label="Creation Date" />
+        <el-table-column prop="creatorName" label="Creator Name" />
+        <el-table-column prop="createdDate" label="Creation Date" />
         <el-table-column label="Actions" width="120" align="center">
           <template #default="scope">
             <el-button

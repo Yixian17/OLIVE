@@ -21,7 +21,7 @@
           prop="ingredients"
         >
           <el-input
-            v-model="ingredient"
+            v-model="ingredients"
             @keydown.enter.prevent="handleKeydown"
             placeholder="e.g. Chicken"
           />
@@ -30,7 +30,7 @@
           }}</el-text>
 
           <div class="pill" v-for="(ing, index) in form.ingredients" :key="ing">
-            {{ ing }}
+            {{ ing.name }}
             <span class="delete-x" @click="removeIngredient(index)">×</span>
           </div>
         </el-form-item>
@@ -39,7 +39,7 @@
         <el-form-item label="Instructions" prop="instructions">
           <el-input
             type="textarea"
-            v-model="form.instructions"
+            v-model="form.instruction"
             :autosize="{ minRows: 4, maxRows: 6 }"
           />
         </el-form-item>
@@ -54,8 +54,8 @@
         </el-form-item>
 
         <!-- Creator -->
-        <el-form-item label="Creator" prop="creator_name">
-          <el-input v-model="form.creator_name" placeholder="Enter your name" />
+        <el-form-item label="Creator" prop="creatorName">
+          <el-input v-model="form.creatorName" placeholder="Enter your name" />
         </el-form-item>
 
         <el-form-item>
@@ -72,20 +72,22 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useRecipeStore } from "../stores/recipeStore";
 import { ElMessage } from "element-plus";
 
 const router = useRouter();
 const route = useRoute();
 const formRef = ref(null);
-const ingredient = ref("");
+const ingredients = ref("");
 const ingredientError = ref("");
+const recipeStore = useRecipeStore();
 
 const form = ref({
   title: "",
   ingredients: [],
   instructions: "",
   difficulty: "",
-  creator_name: "",
+  creatorName: "",
 });
 
 const rules = {
@@ -93,7 +95,7 @@ const rules = {
     { required: true, message: "Title is required", trigger: "blur" },
     { min: 3, message: "Title must be at least 3 characters", trigger: "blur" },
   ],
-  instructions: [
+  instruction: [
     { required: true, message: "Instructions are required", trigger: "blur" },
   ],
   difficulty: [
@@ -118,15 +120,9 @@ const rules = {
 };
 
 const loadRecipe = async () => {
-  const res = await fetch(`http://localhost:3000/recipes/${route.params.id}`);
-  const data = await res.json();
-  form.value = {
-    title: data.title,
-    ingredients: data.ingredients,
-    instructions: data.instructions,
-    difficulty: data.difficulty,
-    creator_name: data.creator_name,
-  };
+  const id = route.params.id;
+  const res = await recipeStore.fetchRecipeById(id);
+  form.value = res;
 };
 
 const removeIngredient = (index) => {
@@ -134,16 +130,16 @@ const removeIngredient = (index) => {
 };
 
 const handleKeydown = () => {
-  const trimmed = ingredient.value.trim();
+  const trimmed = ingredients.value.trim();
   if (!trimmed) {
     ingredientError.value = "Ingredient cannot be empty.";
   } else if (form.value.ingredients.includes(trimmed)) {
     ingredientError.value = "Ingredient already added.";
   } else {
-    form.value.ingredients.push(trimmed);
+    form.value.ingredients.push({ name: trimmed });
     ingredientError.value = "";
   }
-  ingredient.value = "";
+  ingredients.value = "";
 };
 
 const handleUpdate = () => {
@@ -152,16 +148,25 @@ const handleUpdate = () => {
 
     const updatedRecipe = {
       ...form.value,
+      ingredients: form.value.ingredients.map((ing) => ({
+        ingredientName: ing.name || ing.ingredientName || ing,
+      })),
+      instructions: form.value.instruction,
       number_of_ingredients: form.value.ingredients.length,
-      creation_date: new Date().toISOString().split("T")[0],
-      image_blob_url: imagePreview.value,
+      createdDate: new Date().toISOString(),
     };
-
-    await fetch(`http://localhost:3000/recipes/${route.params.id}`, {
+    console.log(JSON.stringify(updatedRecipe, null, 2));
+    await fetch(`http://localhost:8080/api/recipes/${route.params.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedRecipe),
-    });
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Network response was not ok");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
 
     ElMessage.success("Recipe updated successfully!");
     router.push("/recipes/" + route.params.id);

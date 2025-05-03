@@ -36,9 +36,17 @@ public class Recipe {
     private String creatorName;
 
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    private LocalDateTime createdDate = LocalDateTime.now();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Ingredient> ingredients;
+
+    // Helper method to set both sides of the relationship
+    public void addIngredient(String name) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.setIngredientName(name);
+        ingredient.setRecipe(this);
+        this.ingredients.add(ingredient);
+    }
 }
 
