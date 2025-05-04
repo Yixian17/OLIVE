@@ -15,11 +15,7 @@
 
       <div class="details-flex">
         <div class="details-image">
-          <img
-            :src="recipe.image_url"
-            alt="Recipe Image"
-            @error="handleImageError"
-          />
+          <img :src="getImageUrl(recipe.imageUrl)" alt="Recipe Image" />
         </div>
 
         <div class="details-info">
@@ -79,6 +75,13 @@ const loadRecipe = async () => {
   const result = await recipeStore.fetchRecipeById(id);
   recipe.value = result;
   console.log(recipe.value);
+};
+
+const getImageUrl = (relativePath) => {
+  console.log(relativePath);
+  return relativePath && relativePath !== "/uploads/null" && relativePath !== ""
+    ? `http://localhost:8080${relativePath}`
+    : "/images/placeholder-image.jpg"; // fallback image
 };
 
 const goBack = () => {

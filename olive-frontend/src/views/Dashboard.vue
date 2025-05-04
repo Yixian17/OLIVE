@@ -31,7 +31,7 @@
           <el-input-number
             v-model="filterIngredientCount"
             :min="1"
-            width="100%"
+            style="width: 100%; max-width: 180px"
             placeholder="Ingredient count"
             controls-position="right"
             clearable
@@ -56,9 +56,10 @@
         <el-table-column label="Image">
           <template #default="scope">
             <img
-              :src="scope.row.image_url"
+              :src="getImageUrl(scope.row.imageUrl)"
               alt="recipe image"
               class="recipe-thumb"
+              loading="lazy"
             />
           </template>
         </el-table-column>
@@ -80,7 +81,13 @@
           </template>
         </el-table-column>
         <el-table-column prop="creatorName" label="Creator Name" />
-        <el-table-column prop="createdDate" label="Creation Date" />
+
+        <el-table-column prop="createdDate" label="Creation Date">
+          <template #default="scope">
+            {{ formatDate(scope.row.createdDate) }}
+          </template>
+        </el-table-column>
+
         <el-table-column label="Actions" width="120" align="center">
           <template #default="scope">
             <el-button
@@ -122,6 +129,8 @@ const searchTitle = ref("");
 const filterDifficulty = ref("");
 const filterIngredientCount = ref(null);
 
+const previewUrl = ref(null);
+
 const currentPage = ref(1);
 const pageSize = 5;
 
@@ -154,7 +163,7 @@ const filteredRecipes = computed(() => {
     let matchIngredientCount;
     if (filterIngredientCount.value) {
       matchIngredientCount =
-        recipe.number_of_ingredients === filterIngredientCount.value;
+        recipe.ingredients.length === filterIngredientCount.value;
     } else {
       matchIngredientCount = true;
     }
@@ -166,6 +175,17 @@ const paginatedRecipes = computed(() => {
   const start = (currentPage.value - 1) * pageSize;
   return filteredRecipes.value.slice(start, start + pageSize);
 });
+
+const getImageUrl = (relativePath) => {
+  return relativePath && relativePath !== "/uploads/null" && relativePath !== ""
+    ? `http://localhost:8080${relativePath}`
+    : "images/placeholder-image.jpg"; // fallback image
+};
+
+const formatDate = (datetime) => {
+  if (!datetime) return "";
+  return datetime.split("T")[0]; // Extracts only 'YYYY-MM-DD'
+};
 
 const resetFilters = () => {
   searchTitle.value = "";
@@ -179,11 +199,17 @@ const goToDetails = (id) => {
 };
 </script>
 
-<style>
+<style scoped>
 .recipe-thumb {
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+.recipe-thumb:hover {
+  transform: scale(1.05);
 }
 </style>

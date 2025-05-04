@@ -58,6 +58,17 @@
           <el-input v-model="form.creatorName" placeholder="Enter your name" />
         </el-form-item>
 
+        <!-- Upload Image -->
+        <el-form-item label="Upload Image">
+          <input type="file" @change="handleFileUpload" accept="image/*" />
+          <img
+            v-if="imagePreview"
+            :src="imagePreview"
+            alt="Preview"
+            class="image-preview"
+          />
+        </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="handleUpdate"
             >Save Changes</el-button
@@ -80,6 +91,8 @@ const route = useRoute();
 const formRef = ref(null);
 const ingredients = ref("");
 const ingredientError = ref("");
+const imageFile = ref(null);
+const imagePreview = ref("");
 const recipeStore = useRecipeStore();
 
 const form = ref({
@@ -119,10 +132,23 @@ const rules = {
   ],
 };
 
+const handleFileUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    imageFile.value = file;
+    imagePreview.value = URL.createObjectURL(file);
+  }
+};
+
 const loadRecipe = async () => {
   const id = route.params.id;
   const res = await recipeStore.fetchRecipeById(id);
   form.value = res;
+
+  // Show the existing image as preview
+  if (res.imageUrl) {
+    imagePreview.value = `http://localhost:8080${res.imageUrl}`;
+  }
 };
 
 const removeIngredient = (index) => {
@@ -156,17 +182,21 @@ const handleUpdate = () => {
       createdDate: new Date().toISOString(),
     };
     console.log(JSON.stringify(updatedRecipe, null, 2));
+
     await fetch(`http://localhost:8080/api/recipes/${route.params.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedRecipe),
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Network response was not ok");
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    });
+    const recipeid = route.params.id;
+    if (imageFile.value) {
+      const formData = new FormData();
+      formData.append("file", imageFile.value);
+      await fetch(`http://localhost:8080/api/recipes/${recipeid}/image`, {
+        method: "POST",
+        body: formData,
       });
+    }
 
     ElMessage.success("Recipe updated successfully!");
     router.push("/recipes/" + route.params.id);
@@ -207,11 +237,11 @@ onMounted(loadRecipe);
 }
 
 .image-preview {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  object-position: center;
+  margin-top: 10px;
+  max-width: 150px;
+  max-height: 150px;
   border-radius: 8px;
-  background-color: #f4f4f4;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 </style>

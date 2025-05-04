@@ -62,15 +62,18 @@
       </el-form-item>
 
       <!-- Creator -->
-      <el-form-item label="Creator" prop="creator_name">
-        <el-input v-model="form.creator_name" placeholder="Enter your name" />
+      <el-form-item label="Creator" prop="creatorName">
+        <el-input v-model="form.creatorName" placeholder="Enter your name" />
       </el-form-item>
 
       <!-- Upload Image -->
-      <el-form-item label="Image URL" prop="image_url">
-        <el-input
-          v-model="form.image_url"
-          placeholder="https://example.com/image.jpg"
+      <el-form-item label="Upload Image">
+        <input type="file" @change="handleFileUpload" />
+        <img
+          v-if="imagePreview"
+          :src="imagePreview"
+          alt="Preview"
+          class="image-preview"
         />
       </el-form-item>
 
@@ -98,13 +101,15 @@ const form = ref({
   ingredients: [],
   instructions: "",
   difficulty: "",
-  creator_name: "",
+  creatorName: "",
 });
 
 const ingredient = ref("");
 const ingredientError = ref("");
 const showSuccess = ref(false);
 const formRef = ref(null);
+const imageFile = ref(null);
+const imagePreview = ref("");
 
 const rules = {
   title: [
@@ -143,6 +148,15 @@ const rules = {
       trigger: "blur",
     },
   ],
+};
+
+const handleFileUpload = (e) => {
+  // imageFile.value = e.target.files[0];
+  const file = e.target.files[0];
+  if (file) {
+    imageFile.value = file;
+    imagePreview.value = URL.createObjectURL(file);
+  }
 };
 
 const handleKeydown = () => {
@@ -188,36 +202,48 @@ const handleSubmit = async () => {
       return;
     }
 
-    await fetch("http://localhost:8080/api/recipes", {
+    const response = await fetch("http://localhost:8080/api/recipes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(recipe),
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Network response was not ok");
-        alert("Recipe submitted successfully!");
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    });
 
-    console.log(JSON.stringify(recipe, null, 2));
+    if (!response.ok) {
+      console.error("Recipe creation failed");
+      return;
+    }
+
+    const created = await response.json();
+    console.log("Created recipe:", created);
+    const createdRecipeId = created.id;
+
+    if (imageFile.value) {
+      const formData = new FormData();
+      formData.append("file", imageFile.value);
+      await fetch(
+        `http://localhost:8080/api/recipes/${createdRecipeId}/image`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+    }
 
     showSuccess.value = true;
-
-    // Clear form
-    form.value = {
-      title: "",
-      ingredients: [],
-      instructions: "",
-      difficulty: "",
-      creator_name: "",
-    };
 
     // redirect after a short delay
     setTimeout(() => {
       router.push("/");
     }, 1500);
+
+    // // Clear form
+    // form.value = {
+    //   title: "",
+    //   ingredients: [],
+    //   instructions: "",
+    //   difficulty: "",
+    //   creator_name: "",
+    // };
   });
 };
 </script>
@@ -250,5 +276,14 @@ const handleSubmit = async () => {
 .submit-button {
   text-align: right;
   width: 100%;
+}
+
+.image-preview {
+  margin-top: 10px;
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 </style>

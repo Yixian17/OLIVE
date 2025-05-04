@@ -12,19 +12,21 @@ public class RecipeDTO {
     private String instructions;
     private Difficulty difficulty;
     private String creatorName;
+    private String imageUrl;
     private LocalDateTime createdDate;
     private List<IngredientDTO> ingredients;
 
     // Constructors
     public RecipeDTO() {}
 
-    public RecipeDTO(Long id, String title, String instructions, Difficulty difficulty, String creatorName, LocalDateTime createdDate, List<IngredientDTO> ingredients) {
+    public RecipeDTO(Long id, String title, String instructions,Difficulty difficulty, String creatorName, LocalDateTime createdDate,  String imageUrl, List<IngredientDTO> ingredients) {
         this.id = id;
         this.title = title;
         this.instructions = instructions;
         this.difficulty = difficulty;
         this.creatorName = creatorName;
         this .createdDate = createdDate;
+        this.imageUrl = imageUrl;
         this.ingredients = ingredients;
     }
 
@@ -34,6 +36,9 @@ public class RecipeDTO {
 
     public String getTitle() { return title; }
     public void setTitle(String name) { this.title = name; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public String getInstruction() { return instructions; }
     public void setInstructions(String description) { this.instructions = instructions; }

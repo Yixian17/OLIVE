@@ -9,9 +9,15 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +61,7 @@ public class RecipeService {
                 recipe.getDifficulty(),
                 recipe.getCreatorName(),
                 recipe.getCreatedDate(),
+                recipe.getImageUrl(),
                 ingredientDTOs
         );
     }
@@ -87,6 +94,21 @@ public class RecipeService {
         }
 
         recipeRepository.save(existing);
+    }
+
+    @Transactional
+    public void uploadImage(Long recipeId, MultipartFile file) throws IOException {
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+
+        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String uploadDir = "uploads/";
+        Path filePath = Paths.get(uploadDir, filename);
+        Files.createDirectories(filePath.getParent());
+        Files.write(filePath, file.getBytes());
+
+        recipe.setImageUrl("/uploads/" + filename);
+        recipeRepository.save(recipe);
     }
 
     @Transactional
