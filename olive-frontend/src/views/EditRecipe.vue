@@ -164,7 +164,8 @@ const loadRecipe = async () => {
 
   // Show the existing image as preview
   if (res.imageUrl) {
-    imagePreview.value = `https://back-end-oo5f.onrender.com${res.imageUrl}`; // contention
+    // imagePreview.value = `https://back-end-oo5f.onrender.com${res.imageUrl}`; // prod
+    imagePreview.value = `https://localhost:8080${res.imageUrl}`;
   }
   loading.value = false;
 };
@@ -205,7 +206,8 @@ const handleUpdate = () => {
       console.log(JSON.stringify(updatedRecipe, null, 2));
 
       await fetch(
-        `https://back-end-oo5f.onrender.com/api/recipes/${route.params.id}`,
+        // `https://back-end-oo5f.onrender.com/api/recipes/${route.params.id}`,
+        `http://localhost:8080/api/recipes/${route.params.id}`, // for local development
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -217,7 +219,8 @@ const handleUpdate = () => {
         const formData = new FormData();
         formData.append("file", imageFile.value);
         await fetch(
-          `https://back-end-oo5f.onrender.com/api/recipes/${recipeid}/image`,
+          // `https://back-end-oo5f.onrender.com/api/recipes/${recipeid}/image`,
+          `http://localhost:8080/api/recipes/${recipeid}/image`, // for local development
           {
             method: "POST",
             body: formData,

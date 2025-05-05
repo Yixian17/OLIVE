@@ -218,7 +218,8 @@ const handleSubmit = async () => {
       }
 
       const response = await fetch(
-        "https://back-end-oo5f.onrender.com/api/recipes",
+        // "https://back-end-oo5f.onrender.com/api/recipes",
+        "https://localhost:8080/api/recipes",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -238,7 +239,8 @@ const handleSubmit = async () => {
         formData.append("file", imageFile.value);
 
         await fetch(
-          `https://back-end-oo5f.onrender.com/api/recipes/${createdRecipeId}/image`,
+          // `https://back-end-oo5f.onrender.com/api/recipes/${createdRecipeId}/image`,
+          `https://localhost:8080/api/recipes/${createdRecipeId}/image`,
           {
             method: "POST",
             body: formData,
