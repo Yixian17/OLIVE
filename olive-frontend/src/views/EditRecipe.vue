@@ -65,7 +65,11 @@
 
         <!-- Upload Image -->
         <el-form-item label="Upload Image">
-          <input type="file" @change="handleFileUpload" accept="image/*" />
+          <input
+            type="file"
+            @change="handleFileUpload"
+            accept=".jpg, .jpeg, image/jpeg"
+          />
           <img
             v-if="imagePreview"
             :src="imagePreview"
@@ -141,6 +145,12 @@ const rules = {
 const handleFileUpload = (e) => {
   const file = e.target.files[0];
   if (file) {
+    const validTypes = ["image/jpeg", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      ElMessage.error("Only JPG or JPEG images are allowed.");
+      e.target.value = ""; // Clear the file input
+      return;
+    }
     imageFile.value = file;
     imagePreview.value = URL.createObjectURL(file);
   }
@@ -220,7 +230,7 @@ const handleUpdate = () => {
     } catch (error) {
       console.error("Error updating recipe:", error);
       ElMessage.error(
-        "Failed to update recipe. Please Check all fields again."
+        "Failed to update recipe. Please check all fields again."
       );
     } finally {
       loading.value = false;

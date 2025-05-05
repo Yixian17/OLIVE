@@ -13,6 +13,15 @@
         <el-button type="primary" @click="goToEdit" style="float: right"
           >Edit</el-button
         >
+        <el-button
+          type="danger"
+          style="float: right"
+          @click="confirmDelete"
+          :loading="deleting"
+          :disabled="deleting"
+        >
+          Delete
+        </el-button>
       </div>
 
       <h2>{{ recipe.title }}</h2>
@@ -67,11 +76,13 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useRecipeStore } from "../stores/recipeStore";
+import { ElMessageBox, ElMessage } from "element-plus";
 
 const route = useRoute();
 const router = useRouter();
 const recipeStore = useRecipeStore();
 const loading = ref(true);
+const deleting = ref(false);
 
 const recipe = ref(null);
 
@@ -89,6 +100,34 @@ const getImageUrl = (relativePath) => {
   return relativePath && relativePath !== "/uploads/null" && relativePath !== ""
     ? `https://back-end-oo5f.onrender.com${relativePath}` //contention
     : "/images/placeholder-image.jpg"; // fallback image
+};
+
+const confirmDelete = async () => {
+  try {
+    await ElMessageBox.confirm(
+      "Are you sure you want to delete this recipe?",
+      "Delete Confirmation",
+      {
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
+        type: "warning",
+      }
+    );
+    deleting.value = true;
+    await recipeStore.deleteRecipe(route.params.id);
+    ElMessage.success("Recipe deleted successfully");
+
+    // Wait briefly to show success message, then redirect
+    setTimeout(() => {
+      router.push("/");
+    }, 500);
+  } catch (error) {
+    if (error !== "cancel") {
+      ElMessage.error("Failed to delete recipe");
+    }
+  } finally {
+    deleting.value = false;
+  }
 };
 
 const goBack = () => {
@@ -150,5 +189,9 @@ h2 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+.action-right-buttons {
+  display: flex;
+  align-items: center;
 }
 </style>

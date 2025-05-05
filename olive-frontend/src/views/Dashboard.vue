@@ -208,6 +208,8 @@ const goToDetails = (id) => {
   border: 1px solid #eee;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
+  vertical-align: middle;
+  text-align: center;
 }
 .recipe-thumb:hover {
   transform: scale(1.05);

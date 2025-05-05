@@ -34,5 +34,21 @@ export const useRecipeStore = defineStore("recipeStore", {
         console.error(err.message);
       }
     },
+
+    async deleteRecipe(id) {
+      const res = await fetch(
+        `https://back-end-oo5f.onrender.com/api/recipes/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to delete recipe");
+      }
+
+      // Optional: remove it from local store if needed
+      this.recipes = this.recipes.filter((r) => r.id !== id);
+    },
   },
 });
