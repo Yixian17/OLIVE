@@ -178,9 +178,9 @@ const paginatedRecipes = computed(() => {
 
 const getImageUrl = (relativePath) => {
   return relativePath && relativePath !== "/uploads/null" && relativePath !== ""
-    ? // ? `https://back-end-oo5f.onrender.com${relativePath}`
-      `http://localhost:8080${relativePath}` // for local development
-    : "images/placeholder-image.jpg";
+    ? `https://back-end-oo5f.onrender.com${relativePath}`
+    : // `http://localhost:8080${relativePath}` // for local development
+      "images/placeholder-image.jpg";
 };
 
 const formatDate = (datetime) => {
