@@ -9,7 +9,9 @@ export const useRecipeStore = defineStore("recipeStore", {
   actions: {
     async fetchRecipes() {
       try {
-        const res = await fetch("http://localhost:8080/api/recipes");
+        const res = await fetch(
+          "https://back-end-oo5f.onrender.com/api/recipes"
+        );
         if (!res.ok) {
           throw new Error("no data available");
         }
@@ -22,7 +24,9 @@ export const useRecipeStore = defineStore("recipeStore", {
 
     async fetchRecipeById(id) {
       try {
-        const res = await fetch("http://localhost:8080/api/recipes/" + id);
+        const res = await fetch(
+          "https://back-end-oo5f.onrender.com/api/recipes/" + id
+        );
         if (!res.ok) throw new Error("Recipe not found");
         return await res.json();
       } catch (err) {

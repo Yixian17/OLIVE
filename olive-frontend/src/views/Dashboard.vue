@@ -178,7 +178,7 @@ const paginatedRecipes = computed(() => {
 
 const getImageUrl = (relativePath) => {
   return relativePath && relativePath !== "/uploads/null" && relativePath !== ""
-    ? `http://localhost:8080${relativePath}`
+    ? `https://back-end-oo5f.onrender.com${relativePath}`
     : "images/placeholder-image.jpg"; // fallback image
 };
 

@@ -1,5 +1,10 @@
 <template>
-  <div class="edit">
+  <div
+    class="edit"
+    v-loading="loading"
+    element-loading-text="Loading..."
+    element-loading-spinner="el-icon-loading"
+  >
     <el-card>
       <h2>Edit Recipe</h2>
       <el-form
@@ -94,6 +99,7 @@ const ingredientError = ref("");
 const imageFile = ref(null);
 const imagePreview = ref("");
 const recipeStore = useRecipeStore();
+const loading = ref(true);
 
 const form = ref({
   title: "",
@@ -141,14 +147,16 @@ const handleFileUpload = (e) => {
 };
 
 const loadRecipe = async () => {
+  loading.value = true;
   const id = route.params.id;
   const res = await recipeStore.fetchRecipeById(id);
   form.value = res;
 
   // Show the existing image as preview
   if (res.imageUrl) {
-    imagePreview.value = `http://localhost:8080${res.imageUrl}`;
+    imagePreview.value = `https://back-end-oo5f.onrender.com${res.imageUrl}`; // contention
   }
+  loading.value = false;
 };
 
 const removeIngredient = (index) => {
@@ -172,34 +180,51 @@ const handleUpdate = () => {
   formRef.value.validate(async (valid) => {
     if (!valid) return;
 
-    const updatedRecipe = {
-      ...form.value,
-      ingredients: form.value.ingredients.map((ing) => ({
-        ingredientName: ing.name || ing.ingredientName || ing,
-      })),
-      instructions: form.value.instruction,
-      number_of_ingredients: form.value.ingredients.length,
-      createdDate: new Date().toISOString(),
-    };
-    console.log(JSON.stringify(updatedRecipe, null, 2));
+    loading.value = true;
 
-    await fetch(`http://localhost:8080/api/recipes/${route.params.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedRecipe),
-    });
-    const recipeid = route.params.id;
-    if (imageFile.value) {
-      const formData = new FormData();
-      formData.append("file", imageFile.value);
-      await fetch(`http://localhost:8080/api/recipes/${recipeid}/image`, {
-        method: "POST",
-        body: formData,
-      });
+    try {
+      const updatedRecipe = {
+        ...form.value,
+        ingredients: form.value.ingredients.map((ing) => ({
+          ingredientName: ing.name || ing.ingredientName || ing,
+        })),
+        instructions: form.value.instruction,
+        number_of_ingredients: form.value.ingredients.length,
+        createdDate: new Date().toISOString(),
+      };
+      console.log(JSON.stringify(updatedRecipe, null, 2));
+
+      await fetch(
+        `https://back-end-oo5f.onrender.com/api/recipes/${route.params.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedRecipe),
+        }
+      );
+      const recipeid = route.params.id;
+      if (imageFile.value) {
+        const formData = new FormData();
+        formData.append("file", imageFile.value);
+        await fetch(
+          `https://back-end-oo5f.onrender.com/api/recipes/${recipeid}/image`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+      }
+
+      ElMessage.success("Recipe updated successfully!");
+      router.push("/recipes/" + route.params.id);
+    } catch (error) {
+      console.error("Error updating recipe:", error);
+      ElMessage.error(
+        "Failed to update recipe. Please Check all fields again."
+      );
+    } finally {
+      loading.value = false;
     }
-
-    ElMessage.success("Recipe updated successfully!");
-    router.push("/recipes/" + route.params.id);
   });
 };
 

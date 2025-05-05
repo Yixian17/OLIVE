@@ -1,5 +1,5 @@
 <template>
-  <div class="create">
+  <div class="create" v-loading="isLoading">
     <!-- Success Message -->
     <el-alert
       v-if="showSuccess"
@@ -68,7 +68,11 @@
 
       <!-- Upload Image -->
       <el-form-item label="Upload Image">
-        <input type="file" @change="handleFileUpload" />
+        <input
+          type="file"
+          accept=".jpg, .jpeg, image/jpeg"
+          @change="handleFileUpload"
+        />
         <img
           v-if="imagePreview"
           :src="imagePreview"
@@ -110,6 +114,7 @@ const showSuccess = ref(false);
 const formRef = ref(null);
 const imageFile = ref(null);
 const imagePreview = ref("");
+const isLoading = ref(false);
 
 const rules = {
   title: [
@@ -154,6 +159,12 @@ const handleFileUpload = (e) => {
   // imageFile.value = e.target.files[0];
   const file = e.target.files[0];
   if (file) {
+    const validTypes = ["image/jpeg", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      ElMessage.error("Only JPG or JPEG images are allowed.");
+      e.target.value = ""; // Clear the file input
+      return;
+    }
     imageFile.value = file;
     imagePreview.value = URL.createObjectURL(file);
   }
@@ -181,69 +192,72 @@ const removeIngredient = (index) => {
 const handleSubmit = async () => {
   formRef.value.validate(async (valid) => {
     if (!valid) return;
-    const recipe = {
-      ...form.value,
-      ingredients: form.value.ingredients.map((name) => ({
-        ingredientName: name,
-      })),
-      number_of_ingredients: form.value.ingredients.length,
-      creation_date: new Date().toISOString(),
-    };
 
-    await recipeStore.fetchRecipes();
+    isLoading.value = true;
 
-    // Check for duplicate recipe title
-    const duplicate = recipeStore.recipes.find(
-      (r) => r.title.toLowerCase() === recipe.title.toLowerCase()
-    );
+    try {
+      const recipe = {
+        ...form.value,
+        ingredients: form.value.ingredients.map((name) => ({
+          ingredientName: name,
+        })),
+        number_of_ingredients: form.value.ingredients.length,
+        creation_date: new Date().toISOString(),
+      };
 
-    if (duplicate) {
-      ElMessage.error("A recipe with this title already exists!");
-      return;
-    }
+      await recipeStore.fetchRecipes();
 
-    const response = await fetch("http://localhost:8080/api/recipes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(recipe),
-    });
+      // Check for duplicate recipe title
+      const duplicate = recipeStore.recipes.find(
+        (r) => r.title.toLowerCase() === recipe.title.toLowerCase()
+      );
 
-    if (!response.ok) {
-      console.error("Recipe creation failed");
-      return;
-    }
+      if (duplicate) {
+        ElMessage.error("A recipe with this title already exists!");
+        return;
+      }
 
-    const created = await response.json();
-    console.log("Created recipe:", created);
-    const createdRecipeId = created.id;
-
-    if (imageFile.value) {
-      const formData = new FormData();
-      formData.append("file", imageFile.value);
-      await fetch(
-        `http://localhost:8080/api/recipes/${createdRecipeId}/image`,
+      const response = await fetch(
+        "https://back-end-oo5f.onrender.com/api/recipes",
         {
           method: "POST",
-          body: formData,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(recipe),
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Recipe creation failed");
+      }
+
+      const created = await response.json();
+      const createdRecipeId = created.id;
+
+      if (imageFile.value) {
+        const formData = new FormData();
+        formData.append("file", imageFile.value);
+
+        await fetch(
+          `https://back-end-oo5f.onrender.com/api/recipes/${createdRecipeId}/image`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+      }
+
+      showSuccess.value = true;
+
+      // Optional delay for UX
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } catch (error) {
+      console.error(error);
+      ElMessage.error("Something went wrong while creating the recipe.");
+    } finally {
+      isLoading.value = false;
     }
-
-    showSuccess.value = true;
-
-    // redirect after a short delay
-    setTimeout(() => {
-      router.push("/");
-    }, 1500);
-
-    // // Clear form
-    // form.value = {
-    //   title: "",
-    //   ingredients: [],
-    //   instructions: "",
-    //   difficulty: "",
-    //   creator_name: "",
-    // };
   });
 };
 </script>
