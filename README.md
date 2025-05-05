@@ -13,10 +13,12 @@ Backend (Spring Boot with Docker)
    cd backend
 2. Build the Docker image
    ```bash
-   docker build -t recipe-backend .
+   docker build -t recipe-vault-backend .
+
 3. Run the container
    ```bash
-   docker run -p 8080:8080 recipe-backend
+   docker run -d -p 8080:8080 --name recipe-vault-backend recipe-vault-backend
+
    
 Frontend (Vue.js)
 1. Navigate to the frontend directory:
